@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeeHee Chat</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <style>
+        #chat-output{
+            overflow: scroll;
+            min-height:400px;
+            max-height: 600px;
+            background-color: rgb(102, 179, 179);
+        }
+    </style>
+</head>
+
+<body>
+    <div id='app' class='container bg-info'>
+
+        <div id="chat-box row ">
+            <h1 class='h1 text-center'>HeeHee Chat</h1>
+            <div id="chat-output" class='col-12'>
+
+            </div>
+            <div id="feedback" class='col-12 '></div>
+
+            <input type="text" placeholder="name" id="name" class='form-control my-2'>
+            <input type="text" placeholder="message" id="message" class='form-control my-2'>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary my-2" type="button" id='send-btn'>Button</button>
+            </div>
+
+        </div>
+    </div>
+    <script type='text/javascript'>
+        const socket = io('http://localhost:4000');
+        let name = document.getElementById('name');
+        let message = document.getElementById('message');
+        let send = document.getElementById('send-btn');
+        let chatOutput = document.getElementById('chat-output');
+        let feedback = document.getElementById('feedback');
+        send.addEventListener('click', () => {
+            
+            let data = {
+                name: name.value,
+                message: message.value,
+                time: Date.now()
+            };
+            console.log('send....')
+            socket.emit('chat', data);
+            name.value = message.value = '';
+            
+        })
+        message.addEventListener('keypress', () => {
+            socket.emit('typing', name.value);
+        })
+
+        socket.on('chat', (data) => {
+            let o = new Intl.DateTimeFormat("en", {
+                timeStyle: "medium",
+                dateStyle: "short"
+            });
+            // console.log(o.format(Date.now()));
+            let newChat = `<div class="card my-2">
+                                <h5 class="card-header">${data.name} : ${o.format(data.time)}</h5>
+                                <div class="card-body">
+                                    <p class="card-text">${data.message}</p>
+                                </div>
+                            </div>`;
+            feedback.innerHTML = '';
+            chatOutput.innerHTML += newChat;
+        });
+        socket.on('typing', (name) => {
+            console.log(name,'typing');
+            feedback.innerHTML=`<div class="alert alert-success" role="alert"><strong>${name}</strong> is typing....</div>`;
+            setTimeout(()=>{
+                feedback.innerHTML=''
+            },3000)
+        });
+    </script>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
+    -->
+</body>
+
+</html>
