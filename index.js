@@ -4,7 +4,7 @@ const socket=require('socket.io');
 const app=express()
 
 //server set up 
-const server=app.listen(4000||process.env.PORT,()=>{
+const server=app.listen(process.env.PORT||4000,()=>{
     console.log('server is running on port 4000');
 })
 
