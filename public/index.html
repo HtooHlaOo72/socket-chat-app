@@ -97,6 +97,7 @@
                             </div>`;
             feedback.innerHTML = '';
             chatOutput.innerHTML += newChat;
+            chatOutput.scrollTop=chatOutput.scrollHeight;
         });
         socket.on('typing', (name) => {
             console.log(name, 'typing');
