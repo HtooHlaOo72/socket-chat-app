@@ -16,11 +16,12 @@ const io=socket(server);
 io.on('connection',(connection)=>{
     console.log(connection.id,' is connected...');
     connection.on('chat',(data)=>{
-        io.sockets.emit('chat',data);
+        console.log('room_id',data.room)
+        io.sockets.emit(data.room+'',data);
     })
-    connection.on('typing',name=>{
-        console.log('typing',name);
-        connection.broadcast.emit('typing',name);
+    connection.on(`typing`,data=>{
+        console.log('typing',data.name);
+        connection.broadcast.emit(`typing${data.room}`,data);
     })
 
 })

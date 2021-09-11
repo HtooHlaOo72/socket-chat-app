@@ -50,6 +50,7 @@
             </div>
             <div class="col-12" id='keybox'>
                 <div id="feedback" class='col-12 '></div>
+                <input type="text" placeholder="chatroom-id" id="chatroom-id" class='form-control my-2'>
                 <input type="text" placeholder="name" id="name" class='form-control my-2'>
                 <textarea type="text" placeholder="message" id="message" class='form-control my-2'></textarea>
                 <div class="d-grid gap-2">
@@ -67,11 +68,13 @@
         let send = document.getElementById('send-btn');
         let chatOutput = document.getElementById('chat-output');
         let feedback = document.getElementById('feedback');
+        let room_id=document.getElementById('chatroom-id');
         send.addEventListener('click', () => {
-
+            let room=room_id.value;
             let data = {
                 name: name.value,
                 message: message.value,
+                room,
                 time: Date.now()
             };
             console.log('send....')
@@ -80,10 +83,14 @@
 
         })
         message.addEventListener('keypress', () => {
-            socket.emit('typing', name.value);
+            let data={
+                name:name.value,
+                room:room_id.value
+            }
+            socket.emit('typing',data);
         })
 
-        socket.on('chat', (data) => {
+        socket.on(room_id.value+'', (data) => {
             let o = new Intl.DateTimeFormat("en", {
                 timeStyle: "medium",
                 dateStyle: "short"
@@ -99,9 +106,9 @@
             chatOutput.innerHTML += newChat;
             chatOutput.scrollTop=chatOutput.scrollHeight;
         });
-        socket.on('typing', (name) => {
-            console.log(name, 'typing');
-            feedback.innerHTML = `<div class="alert alert-success" role="alert"><strong>${name}</strong> is typing....</div>`;
+        socket.on(`typing${room_id.value}`, (data) => {
+            console.log(data.name, 'typing in',data.room);
+            feedback.innerHTML = `<div class="alert alert-success" role="alert"><strong>${data.name}</strong> is typing....</div>`;
             setTimeout(() => {
                 feedback.innerHTML = ''
             }, 3000)
