@@ -69,6 +69,9 @@
         let chatOutput = document.getElementById('chat-output');
         let feedback = document.getElementById('feedback');
         let room_id=document.getElementById('chatroom-id');
+
+
+        
         send.addEventListener('click', () => {
             let room=room_id.value;
             let data = {
@@ -77,7 +80,7 @@
                 room,
                 time: Date.now()
             };
-            console.log('send....')
+            //console.log('send....')
             socket.emit('chat', data);
             message.value = '';
 
