@@ -80,25 +80,27 @@
                 room,
                 time: Date.now()
             };
-            //console.log('send....')
+            //console.log('send....',data);
             socket.emit('chat', data);
             message.value = '';
 
         })
-        message.addEventListener('keypress', () => {
+        message.addEventListener('input', () => {
             let data={
                 name:name.value,
                 room:room_id.value
             }
+            //console.log('change....');
             socket.emit('typing',data);
         })
 
-        socket.on(room_id.value+'', (data) => {
+        socket.on('chat', (data) => {
+            if(data.room!==room_id.value) return;
             let o = new Intl.DateTimeFormat("en", {
                 timeStyle: "medium",
                 dateStyle: "short"
             });
-            // console.log(o.format(Date.now()));
+            //console.log(data,'responese');
             let newChat = `<div class="card my-2">
                                 <h5 class="card-header">${data.name} : ${o.format(data.time)}</h5>
                                 <div class="card-body">
@@ -109,8 +111,11 @@
             chatOutput.innerHTML += newChat;
             chatOutput.scrollTop=chatOutput.scrollHeight;
         });
-        socket.on(`typing${room_id.value}`, (data) => {
-            console.log(data.name, 'typing in',data.room);
+        socket.on(`typing`, (data) => {
+            if(data.room!==room_id.value){
+                return
+            }
+            //console.log(data.name, 'typing in',data.room);
             feedback.innerHTML = `<div class="alert alert-success" role="alert"><strong>${data.name}</strong> is typing....</div>`;
             setTimeout(() => {
                 feedback.innerHTML = ''
